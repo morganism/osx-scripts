@@ -1,0 +1,17 @@
+---
+# Graph bindings -------------------------------------------------
+#
+data_path: ~/data
+output_path: ~/output
+strategies:
+    epoxy:
+        bind: 1
+        rate: 1
+        interval: 60
+        unit: seconds
+    loose:
+        bind: 1
+        rate: 1
+        interval: 60
+        unit: seconds 
+graph_strategy: epoxy
