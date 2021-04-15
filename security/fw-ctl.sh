@@ -13,6 +13,10 @@ function usage {
       echo -n
 
       echo "Try this:\n defaults read /Library/Preferences/"
+      echo "and this : /usr/libexec/ApplicationFirewall/socketfilterfw --setblockall on"
+      echo "http://krypted.com/mac-security/command-line-firewall-management-in-os-x-10-10/"
+      echo sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -help
+      echo sudo /usr/libexec/ApplicationFirewall/socketfilterfw --list
   fi
 
   exit
@@ -34,6 +38,12 @@ elif [[ $1 =~ "essential" ]]; then
 elif [[ $1 =~ "read" ]]; then
   VERBOSE=true
   MSG="Read mode selected"
+elif [[ $1 =~ "block" ]]; then
+  echo "Setting BLock ALL ON"  
+  /usr/libexec/ApplicationFirewall/socketfilterfw --setblockall on
+  echo "Blocking Remote Management"
+  sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -deactivate -configure -access -off
+  sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -deactivate -stop
 else
   usage
   exit
@@ -42,6 +52,12 @@ fi
 echo "Action=[$ACTION], CMD_ARGS=[$CMD_ARGS]"
 echo "sudo defaults $ACTION /Library/Preferences/com.apple.alf globalstate $CMD_ARGS"
 echo "sudo defaults $ACTION /Library/Preferences/com.apple.alf $CMD_ARGS"
+echo "1."
 sudo defaults $ACTION /Library/Preferences/com.apple.alf globalstate $CMD_ARGS
+echo "1.."
 sudo defaults $ACTION /Library/Preferences/com.apple.alf $CMD_ARGS
+echo "1..."
 
+echo "Output of '/usr/libexec/ApplicationFirewall/socketfilterfw --getblockall'"
+/usr/libexec/ApplicationFirewall/socketfilterfw --getblockall
+echo "1...."
