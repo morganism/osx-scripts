@@ -1,0 +1,15 @@
+---
+# Dataset Stuff -------------------------------------------------
+#
+data_path: ~/data
+output_path: ~/output
+
+binding:
+    weight: $max - $min
+    decay: true
+    ttl: 3600
+    dns: true
+    
+nodes: any
+
+exclude: {proc(resolver $node) { |n| map(&:max_weight) } }
