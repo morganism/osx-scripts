@@ -8,6 +8,8 @@
 #FORMAT=" --csv "
 FORMAT=" --format=csv "
 
+FORMAT=" --format=json "
+
 source "$(dirname $0)/speedtest.common"
 
 COMMAND="$(eval $SPEEDTEST_CMD)"
