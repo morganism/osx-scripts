@@ -1,0 +1,52 @@
+#!/bin/bash
+# keep track of network speed over time
+# author: morganism.dev
+# Fri 22 Dec 2023 14:31:27 GMT
+#
+DEF='\x1B[0m'
+BLD='\x1B[1m'
+DIM='\x1B[2m'
+ITAL='\x1B[3m'
+FBLK='\x1B[30m'
+FRED='\x1B[31m'
+FGRN='\x1B[32m'
+FYLW='\x1B[33m'
+FBLU='\x1B[34m'
+FMGN='\x1B[35m'
+FCYN='\x1B[36m'
+FWHT='\x1B[37m'
+BBLK='\x1B[40m'
+BRED='\x1B[41m'
+BGRN='\x1B[42m'
+BYLW='\x1B[43m'
+BBLU='\x1B[44m'
+BMGN='\x1B[45m'
+BCYN='\x1B[46m'
+BWHT='\x1B[47m'
+
+LOGDIR="${HOME}/data/log/speedtest"
+BASE=$(basename $0)
+LOGBASE="${LOGDIR}/${BASE}"
+
+echo -e "${BBLK}${FWHT}First we'll check some direcorties, ${FGRN}Green${FWHT}${BBLK} is good and ${FRED}Red${FWHT}${BBLK} is bad${DEF}"
+if [ -d $LOGBASE ]; then
+	echo -e "${BBLK}${FGRN}LOGDIRS exist .. OK${DEF}"
+else
+	echo -e "${BBLK}${FRED}LOGDIRS do NOT exist${FWHT}, please fix these problems${DEF}"
+	echo -e "${BBLK}${FYLW}Suggestion, create ${FMGN}${LOGBASE}${DEF}"
+fi
+
+STDOUT_APPEND="$(1>>${LOGBASE}.log)"
+STDERR_APPEND="$(2>>${LOGBASE}.err)"
+
+SPEEDTEST_SECURE_OPTION=" --secure "
+SPEEDTEST_SECURE_SUPPORT_TEST="$(speedtest --secure 2>&1| grep -c 'Unrecognized')"
+if [[ $SPEEDTEST_SECURE_SUPPORT_TEST =~ 1 ]]; then
+	SPEEDTEST_SECURE_OPTION=""
+fi
+
+SPEEDTEST_DEFAULT_FORMAT=" --json "
+SPEEDTEST_FORMAT="${FORMAT:-$SPEEDTEST_DEFAULT_FORMAT}" # here the var FORMAT is supplied by the executing script
+
+SPEEDTEST_CMD='$(which speedtest) ${SPEEDTEST_SECURE_OPTION} ${SPEEDTEST_FORMAT} ${STDOUT_APPEND} ${STDERR_APPEND}'
+
