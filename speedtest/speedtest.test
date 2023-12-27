@@ -1,0 +1,17 @@
+#!/bin/bash
+# keep track of network speed over time
+# author: morganism.dev
+#
+
+# N.B. you may have to construct your output format string according to your speedtest version
+#FORMAT=" --format=csv "
+#FORMAT=" --csv "
+FORMAT=" --format=csv "
+
+FORMAT=" --format=json "
+
+source "$(dirname $0)/speedtest.common"
+
+COMMAND="$(eval $SPEEDTEST_CMD)"
+echo $COMMAND
+
