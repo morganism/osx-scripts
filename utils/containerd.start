@@ -1,0 +1,32 @@
+#!/bin/bash
+# 
+# author: morganism.dev
+# date: Wed 27 Dec 2023 00:10:20 GMT
+#
+# brew start containerd and dockerd services
+
+sudo echo "Need sudo to run this script"
+echo "About to start containerd"
+sudo brew services start containerd
+echo "containerd started"
+echo "About to start dockerd"
+sudo brew services start dockerd
+echo "dockerd started"
+
+CLI_PLUGINS_DIR="~/.docker/cli-plugins"
+PLATFORM='--platform linux/amd64'
+GITHUB_ACCESS_TOKEN=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
+GITHUB_USERNAME=morganism
+
+echo "Ensure $CLI_PLUGINS_DIR exists"
+mkdir -p $CLI_PLUGINS_DIR
+
+echo "Linking docker-buildx"
+ln -sfn /opt/homebrew/opt/docker-buildx/bin/docker-buildx $CLI_PLUGINS_DIR/docker-buildx
+
+echo "You’ll now want to authenticate to GitHub Container registry:"
+echo $GITHUB_ACCESS_TOKEN | docker login ghcr.io -u $GITHUB_USERNAME --password-stdin
+
+echo "And finally, it’s time to run your first native macOS container:"
+#docker run $PLATFORM --rm -it ghcr.io/macoscontainers/macos-jail/ventura:latest echo "Hello from macOS container"
+docker run $PLATFORM --rm -it ghcr.io/macoscontainers/macos-jail/sonoma:latest echo "Hello from macOS container"
