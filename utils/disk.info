@@ -1,0 +1,4 @@
+#!/bin/bash
+sudo echo "Password first"
+
+for i in 0 1 2 3 4 5; do sudo fdisk /dev/disk${i}; done
