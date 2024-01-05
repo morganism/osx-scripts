@@ -9,12 +9,58 @@ set :port, 4567
 
 get '/' do
   readCSV
+  aggregate_stats
   erb :chart
 end
 
 def readCSV
   @data = CSV.read(File.expand_path('~/data/log/speedtest/speedtest.csv'), headers: true)
 end
+
+def aggregate_stats
+  @total_point_count = 0
+  @download_lo_count = 0
+  @download_hi_count = 0
+
+  strks = []
+
+  @data.each do |row|
+    datetime = row['DATETIME']
+    download_lo = row['DOWNLOADLOW']
+    download_hi = row['DOWNLOADHI']
+    upload = row['UPLOAD']
+    sla_value = row['SLA']
+
+    sla = download_hi.to_i > 0 ? true : false # download Mbits/s is greater than SLA then 'sla' is true as it has been met
+   
+    @download_lo_count += 1 unless sla
+    @download_hi_count += 1 if sla
+
+    if (sla)
+      strks << 1
+    else
+      strks << 0
+    end
+
+    @total_point_count += 1
+  end
+  @percent_sla = @download_hi_count.to_f / @total_point_count.to_f
+  
+  strks_string = strks.join('')
+  strks_string.gsub!(/0+/, '0')
+  @strks_ary = strks_string.split('0').sort.reverse
+  @streak_count = {}
+  @strks_ary.each do |elt|
+    if (elt.length > 1) # a streak is more than 1 in a row
+      key = "#{elt.length * 5}m"
+      @streak_count[key] = (@streak_count[key].nil?) ? 1 : @streak_count[key] + 1
+    end
+  end
+  
+ 
+  
+end
+
 
 __END__
 
@@ -39,8 +85,6 @@ __END__
           ['<%= row['DATETIME'] %>', <%= row['DOWNLOADLOW'] %>,<%= row['DOWNLOADHI'] %> ,<%= row['UPLOAD'] %>, <%= row['SLA'] %>],
         <% end %>
       ]);
-
-// ...
 
       var options = {
         title: 'Speedtest Data',
@@ -79,36 +123,8 @@ __END__
 
 
     }
-
-
-// ...
-
-// Calculate DOWNLOAD as DOWNLOADHI + DOWNLOADLOW
-//data.addColumn('number', 'DOWNLOAD');
-//data.addRows([
-  //<% @data.each do |row| %>
-    //['<%= row['DATETIME'] %>', <%= row['DOWNLOADLOW'].to_f + row['DOWNLOADHI'].to_f %>, <%= row['UPLOAD'] %>, <%= row['SLA'] %>],
-  //<% end %>
-//]);
-
-// ...
-
-// Loop through each row to set colors based on DOWNLOAD values
-//for (var i = 0; i < data.getNumberOfRows(); i++) {
-  //var downloadValue = data.getValue(i, 1);
-  //var uploadValue = data.getValue(i, 2);
-
-  // Set colors based on the condition for DOWNLOAD and UPLOAD
-  //var downloadColor = downloadValue > 268 ? '#00FF00' : '#8B0000'; // Dark red
-  //var uploadColor = uploadValue > 268 ? '#FF0000' : '#FF0000';
-
-  // Set the color for the data points
-  //data.setRowProperty(i, 'style', 'point { stroke-color: ' + downloadColor + '; fill-color: ' + downloadColor + '; }');
-  //data.setRowProperty(i, 'style', 'point { stroke-color: ' + uploadColor + '; fill-color: ' + uploadColor + '; }');
-//}
-
-// ...
   </script>
+
   <style>
     .red
     {
@@ -157,7 +173,18 @@ __END__
           <li>UPLOAD is in <span class="blue">BLUE</span>.</li>
         </ul>
     </div>
-  <main>
+    <div>
+     <span>
+      <ul>
+        <li>Total point count = <%= @total_point_count %></li>
+        <li>Below SLA count   = <%= @download_lo_count %></li>
+        <li>Above SLA count   = <%= @download_hi_count %></li>
+        <li>Percent SLA       = <%= @percent_sla %></li>
+        <li>Streaks       = <%= @streak_count %></li>
+      </ul>
+      </span>
+    </div>
+  </main>
   <footer>
   <div>
     Copyleft. All rights reversed. <a target="_blank" href="https://git.morganism.dev/osx-utils/tree/master/speedtest/rare_medium/visualise/">GitHub source</a>
