@@ -2,3 +2,6 @@
 [2024-01-05 11:04:02] INFO  ruby 3.3.0 (2023-12-25) [x86_64-darwin20]
 == Sinatra (v3.2.0) has taken the stage on 4567 for development with backup from WEBrick
 [2024-01-05 11:04:02] INFO  WEBrick::HTTPServer#start: pid=35439 port=4567
+127.0.0.1 - - [05/Jan/2024:11:16:43 +0000] "GET / HTTP/1.1" 200 285052 0.2027
+127.0.0.1 - - [05/Jan/2024:11:16:42 GMT] "GET / HTTP/1.1" 200 285052
+- -> /
