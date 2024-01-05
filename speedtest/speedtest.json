@@ -8,4 +8,3 @@ BASE=$(basename $0)
 LOGBASE="${LOGDIR}/${BASE}"
 
 /usr/local/bin/speedtest --secure --json 1>>${LOGBASE}.log 2>>${LOGBASE}.err 
-

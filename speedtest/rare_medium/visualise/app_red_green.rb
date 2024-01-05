@@ -103,10 +103,55 @@ for (var i = 0; i < data.getNumberOfRows(); i++) {
 
 // ...
   </script>
+  <link rel="stylesheet" type="text/css" href="styles.css">
+  <style>
+    .red
+    {
+      color:red;
+    }
+    .green
+    {
+      color:green;
+    }
+    .blue
+    {
+      color:blue;
+    }
+    body {
+      margin: 0;
+    }
+    
+    main {
+      min-height: calc(100vh - 4rem);
+    }
+    
+    footer {
+      height: 4rem;
+      position: fixed;
+      bottom: 0;
+    }
+  </style>
 </head>
 <body>
-  <h1>Speedtest Data Visualization</h1>
-  <div id="chart_div" style="height: 500px; width: 95%"></div>
+  <main>
+    <h1>Speedtest Data Visualization</h1>
+    <div id="chart_div" style="height: 500px; width: 95%"></div>
+    <div id="chart_div_description">
+      <span id="chart_div_description_span">
+        This chart shows Speedtest results of samples taken every 5 minute. The Y-axis or height of the point indicates the value for Mbits/s at the time the sample was measured.
+      </span>
+        <ul id="chart_div_description_span_ul">
+          <li>DOWNLOADLOW is in <span class="red">RED</span>. Any sample that has a value which is less than the published SLA (268 Mbits/s) is part of this series.</li>
+          <li>DOWNLOADHI is in <span class="green">GREEN</span>. Any sample that has a value which equals or exceeds the published SLA is part of this series.</li>
+          <li>UPLOAD is in <span class="blue">BLUE</span>.</li>
+        </ul>
+    </div>
+  <main>
+  <footer>
+  <div>
+    Copyleft. All rights reversed. <a href="https://git.morganism.dev/osx-utils/tree/master/speedtest/rare_medium/visualise/">GitHub source</a>
+  </div>
+  </footer>
 </body>
 </html>
 
