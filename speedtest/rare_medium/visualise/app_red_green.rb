@@ -132,7 +132,7 @@ for (var i = 0; i < data.getNumberOfRows(); i++) {
       margin-left: 10px;
       margin-right: 10px;
     }
-    #chart_div_description {
+    .description {
       margin-top: 50px;
       margin-bottom: 50px;
     }
@@ -141,7 +141,7 @@ for (var i = 0; i < data.getNumberOfRows(); i++) {
 <body>
   <main>
     <h1>Speedtest Data Visualization</h1>
-    <div id="chart_div" style="height: 500px; width: 95%"></div>
+    <div class="description" id="chart_div" style="height: 500px; width: 95%"></div>
     <div id="chart_div_description">
       <span id="chart_div_description_span">
         This chart shows Speedtest results of samples taken every 5 minute. The Y-axis or height of the point indicates the value for Mbits/s at the time the sample was measured.
