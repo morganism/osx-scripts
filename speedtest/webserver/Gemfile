@@ -1,0 +1,9 @@
+# Gemfile
+
+source "https://rubygems.org"
+
+group :test do
+  gem 'rake'
+  gem 'rspec'
+  gem 'rack-test'
+end# frozen_string_literal: true

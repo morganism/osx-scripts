@@ -1,0 +1,108 @@
+<!-- views/chart.erb -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speed Test Chart</title>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+</head>
+<body>
+  <h1>Speed Test Chart</h1>
+
+  <script>
+    // D3.js chart generation logic
+    // Customize this based on your specific requirements
+    // Example: Bar chart with dates on X-axis and speeds on Y-axis
+    // Line 17: Change 'dates' to 'data'
+    var dates = data.map(function(entry) {
+        return entry.date;
+    });
+
+    // Line 22: Change 'downloads' to 'data'
+    var downloads = data.map(function(entry) {
+        return entry.download;
+    });
+    // Line 26: Change 'uploads' to 'data'
+    var uploads = data.map(function(entry) {
+        return entry.upload;
+    });
+
+    // Add horizontal lines for Guaranteed Download and Upload
+    var guaranteedDownload = <%= config[:guaranteed_download] %>;
+    var guaranteedUpload = <%= config[:guaranteed_upload] %>;
+
+    // Your D3.js code here...
+    // Example: Drawing horizontal lines at guaranteedDownload and guaranteedUpload
+    d3.select('body')
+      .append('svg')
+      .append('line')
+      .attr('x1', 0)
+      .attr('y1', yScale(guaranteedDownload))
+      .attr('x2', width)
+      .attr('y2', yScale(guaranteedDownload))
+      .style('stroke', 'red')
+      .style('stroke-width', 2);
+
+    d3.select('body')
+      .select('svg')
+      .append('line')
+      .attr('x1', 0)
+      .attr('y1', yScale(guaranteedUpload))
+      .attr('x2', width)
+      .attr('y2', yScale(guaranteedUpload))
+      .style('stroke', 'blue')
+      .style('stroke-width', 2);
+
+
+    // Calculate linear regression (line of best fit)
+    var x = dates.map(function(date, index) { return index; });
+    var y = downloads;
+
+    var regression = linearRegression(x, y);
+    var lineOfBestFit = regression.map(function(slope, intercept) {
+      return x.map(function(xi) { return slope * xi + intercept; });
+    });
+
+    // Your D3.js code here...
+    // Example: Plotting the line of best fit
+    d3.select('body')
+      .select('svg')
+      .append('path')
+      .datum(lineOfBestFit[1]) // y-values of the line
+      .attr('d', d3.line()
+        .x(function(d, i) { return xScale(i); })
+        .y(function(d) { return yScale(d); })
+      )
+      .style('stroke', 'green')
+      .style('stroke-width', 2);
+
+
+
+
+
+
+    // Calculate linear regression (line of best fit)
+    var x = dates.map(function(date, index) { return index; });
+    var y = downloads;
+
+    var regression = linearRegression(x, y);
+    var lineOfBestFit = regression.map(function(slope, intercept) {
+      return x.map(function(xi) { return slope * xi + intercept; });
+    });
+
+    // Calculate RMSD
+    var rmsd = calculateRMSD(y, lineOfBestFit[1]);
+
+    // Display RMSD on the chart
+    d3.select('body')
+      .append('div')
+      .text('Root Mean Square Deviation (RMSD): ' + rmsd.toFixed(2))
+      .style('font-size', '16px')
+      .style('color', 'purple');
+
+
+  </script>
+</body>
+</html>
+
