@@ -3,6 +3,10 @@ require 'sinatra'
 require 'csv'
 require 'chartkick'
 
+set :bind, '0.0.0.0'
+set :port, 4567
+
+
 get '/' do
   @data = CSV.read(File.expand_path('~/data/log/speedtest/speedtest.csv'), headers: true)
   erb :chart
