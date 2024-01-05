@@ -132,6 +132,10 @@ for (var i = 0; i < data.getNumberOfRows(); i++) {
       margin-left: 10px;
       margin-right: 10px;
     }
+    #chart_div_description {
+      margin-top: 50px;
+      margin-bottom: 50px;
+    }
   </style>
 </head>
 <body>
