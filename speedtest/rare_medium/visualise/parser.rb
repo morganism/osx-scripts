@@ -2,6 +2,8 @@
 
 require 'date'
 
+SLA_VALUE=268 # Mbits/s
+
 log_file_path = '~/data/log/speedtest/speedtest.simple.log'
 
 # Read the log file
@@ -55,9 +57,9 @@ end
 #puts "Downloads: #{downloads}"
 #puts "Uploads: #{uploads}"
 
-puts "DATETIME,DOWNLOADLOW,DOWNLOADHI,UPLOAD"
+puts "DATETIME,DOWNLOADLOW,DOWNLOADHI,UPLOAD,SLA"
 count = datetimes.size
 for i in 0..count do
-  line = "#{datetimes[i]},#{downloadls[i]},#{downloadhs[i]},#{uploads[i]}"
+  line = "#{datetimes[i]},#{downloadls[i]},#{downloadhs[i]},#{uploads[i]},#{SLA_VALUE}"
   puts line unless line.eql? ',,,'
 end

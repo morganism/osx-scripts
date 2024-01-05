@@ -8,8 +8,12 @@ set :port, 4567
 
 
 get '/' do
-  @data = CSV.read(File.expand_path('~/data/log/speedtest/speedtest.csv'), headers: true)
+  readCSV
   erb :chart
+end
+
+def readCSV
+  @data = CSV.read(File.expand_path('~/data/log/speedtest/speedtest.csv'), headers: true)
 end
 
 __END__
@@ -29,47 +33,49 @@ __END__
       data.addColumn('number', 'DOWNLOADLOW');
       data.addColumn('number', 'DOWNLOADHI');
       data.addColumn('number', 'UPLOAD');
+      data.addColumn('number', 'SLA');
       data.addRows([
         <% @data.each do |row| %>
-          ['<%= row['DATETIME'] %>', <%= row['DOWNLOADLOW'] %>,<%= row['DOWNLOADHI'] %> ,<%= row['UPLOAD'] %>],
+          ['<%= row['DATETIME'] %>', <%= row['DOWNLOADLOW'] %>,<%= row['DOWNLOADHI'] %> ,<%= row['UPLOAD'] %>, <%= row['SLA'] %>],
         <% end %>
       ]);
 
 // ...
 
-var options = {
-  title: 'Speedtest Data',
-  curveType: 'none',
-  legend: { position: 'bottom' },
-  pointSize: 1,
-  series: {
-            0: { color: '#ff0000',
-                 lineWidth: 2,
-                 pointSize: 2 },
-            1: { color: '#0fff0f',
-                 lineWidth: 1,
-                 pointSize: 2 },
-            2: { color: '#0000ff' }
-  }
-};
-
-// Loop through each row to set colors based on DOWNLOAD values
-for (var i = 0; i < data.getNumberOfRows(); i++) {
-  var downloadValue = data.getValue(i, 1);
-  var uploadValue = data.getValue(i, 2);
-
-  // Set colors based on the condition for DOWNLOAD and UPLOAD
-  var downloadColor = downloadValue > 268 ? '#00FF00' : '#FF0000';  // Adjusted this line
-  var uploadColor = uploadValue > 268 ? '#FF0000' : '#FF0000';
-
-  // Set the color for the data points
-  data.setRowProperty(i, 'style', 'point { stroke-color: ' + downloadColor + '; fill-color: ' + downloadColor + '; }');
-  data.setRowProperty(i, 'style', 'point { stroke-color: ' + downloadColor + '; fill-color: ' + downloadColor + '; }');
-  data.setRowProperty(i, 'style', 'point { stroke-color: ' + uploadColor + '; fill-color: ' + uploadColor + '; }');
-}
-
-var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
-chart.draw(data, options);
+      var options = {
+        title: 'Speedtest Data',
+        curveType: 'none',
+        legend: { position: 'bottom' },
+        pointSize: 1,
+        series: {
+                  0: { color: '#ff0000',
+                       lineWidth: 2,
+                       pointSize: 2 },
+                  1: { color: '#0fff0f',
+                       lineWidth: 1,
+                       pointSize: 2 },
+                  2: { color: '#0000ff' },
+                  3: { color: '#777777' }
+        }
+      };
+      
+      // Loop through each row to set colors based on DOWNLOAD values
+      for (var i = 0; i < data.getNumberOfRows(); i++) {
+        var downloadValue = data.getValue(i, 1);
+        var uploadValue = data.getValue(i, 2);
+      
+        // Set colors based on the condition for DOWNLOAD and UPLOAD
+        var downloadColor = downloadValue > 268 ? '#00FF00' : '#FF0000';  // Adjusted this line
+        var uploadColor = uploadValue > 268 ? '#FF0000' : '#FF0000';
+      
+        // Set the color for the data points
+        data.setRowProperty(i, 'style', 'point { stroke-color: ' + downloadColor + '; fill-color: ' + downloadColor + '; }');
+        data.setRowProperty(i, 'style', 'point { stroke-color: ' + downloadColor + '; fill-color: ' + downloadColor + '; }');
+        data.setRowProperty(i, 'style', 'point { stroke-color: ' + uploadColor + '; fill-color: ' + uploadColor + '; }');
+      }
+      
+      var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
 
 
     }
@@ -78,32 +84,31 @@ chart.draw(data, options);
 // ...
 
 // Calculate DOWNLOAD as DOWNLOADHI + DOWNLOADLOW
-data.addColumn('number', 'DOWNLOAD');
-data.addRows([
-  <% @data.each do |row| %>
-    ['<%= row['DATETIME'] %>', <%= row['DOWNLOADLOW'].to_f + row['DOWNLOADHI'].to_f %>, <%= row['UPLOAD'] %>],
-  <% end %>
-]);
+//data.addColumn('number', 'DOWNLOAD');
+//data.addRows([
+  //<% @data.each do |row| %>
+    //['<%= row['DATETIME'] %>', <%= row['DOWNLOADLOW'].to_f + row['DOWNLOADHI'].to_f %>, <%= row['UPLOAD'] %>, <%= row['SLA'] %>],
+  //<% end %>
+//]);
 
 // ...
 
 // Loop through each row to set colors based on DOWNLOAD values
-for (var i = 0; i < data.getNumberOfRows(); i++) {
-  var downloadValue = data.getValue(i, 1);
-  var uploadValue = data.getValue(i, 2);
+//for (var i = 0; i < data.getNumberOfRows(); i++) {
+  //var downloadValue = data.getValue(i, 1);
+  //var uploadValue = data.getValue(i, 2);
 
   // Set colors based on the condition for DOWNLOAD and UPLOAD
-  var downloadColor = downloadValue > 268 ? '#00FF00' : '#8B0000'; // Dark red
-  var uploadColor = uploadValue > 268 ? '#FF0000' : '#FF0000';
+  //var downloadColor = downloadValue > 268 ? '#00FF00' : '#8B0000'; // Dark red
+  //var uploadColor = uploadValue > 268 ? '#FF0000' : '#FF0000';
 
   // Set the color for the data points
-  data.setRowProperty(i, 'style', 'point { stroke-color: ' + downloadColor + '; fill-color: ' + downloadColor + '; }');
-  data.setRowProperty(i, 'style', 'point { stroke-color: ' + uploadColor + '; fill-color: ' + uploadColor + '; }');
-}
+  //data.setRowProperty(i, 'style', 'point { stroke-color: ' + downloadColor + '; fill-color: ' + downloadColor + '; }');
+  //data.setRowProperty(i, 'style', 'point { stroke-color: ' + uploadColor + '; fill-color: ' + uploadColor + '; }');
+//}
 
 // ...
   </script>
-  <link rel="stylesheet" type="text/css" href="styles.css">
   <style>
     .red
     {
