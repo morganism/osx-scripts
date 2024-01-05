@@ -118,7 +118,7 @@ for (var i = 0; i < data.getNumberOfRows(); i++) {
       color:blue;
     }
     body {
-      margin: 0;
+      margin: 10px;
     }
     
     main {
@@ -129,6 +129,8 @@ for (var i = 0; i < data.getNumberOfRows(); i++) {
       height: 4rem;
       position: fixed;
       bottom: 0;
+      margin-left: 10px;
+      margin-right: 10px;
     }
   </style>
 </head>
@@ -149,7 +151,7 @@ for (var i = 0; i < data.getNumberOfRows(); i++) {
   <main>
   <footer>
   <div>
-    Copyleft. All rights reversed. <a href="https://git.morganism.dev/osx-utils/tree/master/speedtest/rare_medium/visualise/">GitHub source</a>
+    Copyleft. All rights reversed. <a target="_blank" href="https://git.morganism.dev/osx-utils/tree/master/speedtest/rare_medium/visualise/">GitHub source</a>
   </div>
   </footer>
 </body>
