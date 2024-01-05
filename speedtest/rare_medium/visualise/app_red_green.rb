@@ -106,7 +106,7 @@ for (var i = 0; i < data.getNumberOfRows(); i++) {
 </head>
 <body>
   <h1>Speedtest Data Visualization</h1>
-  <div id="chart_div" style="height: 500px;"></div>
+  <div id="chart_div" style="height: 500px; width: 95%"></div>
 </body>
 </html>
 
