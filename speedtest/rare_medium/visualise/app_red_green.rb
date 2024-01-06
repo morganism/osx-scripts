@@ -47,16 +47,35 @@ def aggregate_stats
   @percent_sla = @download_hi_count.to_f / @total_point_count.to_f
   
   strks_string = strks.join('')
-  strks_string.gsub!(/0+/, '0')
+  fails_string = strks_string
+  strks_string = strks_string.gsub(/0+/, '0')
+  fails_string = fails_string.gsub(/1+/, '1')
   @strks_ary = strks_string.split('0').sort.reverse
+  @fails_ary = fails_string.split('1').sort.reverse
   @streak_count = {}
+  @fails_count = {}
   @strks_ary.each do |elt|
-    if (elt.length > 1) # a streak is more than 1 in a row
+    if (elt.length > 2) # a streak is more than 2 in a row
       key = "#{elt.length * 5}m"
       @streak_count[key] = (@streak_count[key].nil?) ? 1 : @streak_count[key] + 1
     end
   end
+  @fails_ary.each do |elt|
+    if (elt.length > 2) # a streak is more than 2 in a row
+      key = "#{elt.length * 5}m"
+      @fails_count[key] = (@fails_count[key].nil?) ? 1 : @fails_count[key] + 1
+    end
+  end
   
+  # let's use some beautiful ruby sugar to calculate days, hours, minutes of given duration in sconds
+  # @total_point_count * 5 will give total_seconds
+  total_seconds = @total_point_count * 5 * 60                                  # number of seconds  
+  @time_span = Time.at(total_seconds).utc.strftime("%H:%M:%S")
+
+  mm, ss = total_seconds.divmod(60)
+  hh, mm = mm.divmod(60)
+  dd, hh = hh.divmod(24)
+  @sample_span_dhms = "%d days, %d hours, %d minutes and %d seconds" % [dd, hh, mm, ss]
  
   
 end
@@ -138,6 +157,10 @@ __END__
     {
       color:blue;
     }
+    .td65percent {
+      max-width: 300px; // Desired max width
+      width: max-content;
+    }
     body {
       margin: 10px;
     }
@@ -157,6 +180,30 @@ __END__
       margin-top: 50px;
       margin-bottom: 50px;
     }
+    .metric_description {
+      color: "#555555";
+    }
+    table{
+      table-layout: fixed;
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    td{
+      word-wrap:break-word;
+      max-width: 25%;
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
+    th {
+      border: 1px solid black;
+      border-collapse: collapse;
+      background-color: lightgrey;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+      border: 1px solid black;
+      border-collapse: collapse;
+    }
   </style>
 </head>
 <body>
@@ -174,14 +221,50 @@ __END__
         </ul>
     </div>
     <div>
-     <span>
-      <ul>
-        <li>Total point count = <%= @total_point_count %></li>
-        <li>Below SLA count   = <%= @download_lo_count %></li>
-        <li>Above SLA count   = <%= @download_hi_count %></li>
-        <li>Percent SLA       = <%= @percent_sla %></li>
-        <li>Streaks       = <%= @streak_count %></li>
-      </ul>
+      <span>
+        <table>
+          <tr>
+            <th>Metric</th>
+            <th>Value</th>
+            <th>Description</th>
+          </tr> 
+  
+          <tr>
+            <td>Sample Span</td>
+            <td class="td65percent"><%= @sample_span_dhms %></div></td>
+            <td><span class="metric_description">The span of time covered by these metrics.</span></td>
+          </tr> 
+          <tr>
+            <td>Total point count</td>
+            <td class="td65percent"><%= @total_point_count %></div></td>
+            <td><span class="metric_description">The total count of the 5 minute samples present in the metric calculations.</span></td>
+          </tr> 
+          <tr>
+            <td>Below SLA count</td>
+            <td><div class="td65percent"><%= @download_lo_count %></div></td>
+            <td><span class="metric_description">The count of 5 minute samples that fall below the published SLA value of 268 Mbits/s</span></td>
+          </tr> 
+          <tr>
+            <td>Above SLA count</td>
+            <td></span><div class="td65percent"><%= @download_hi_count %></div></td>
+            <td><span class="metric_description">The count of 5 minute samples that fall within the published 268 Mbit/s SLA.</span></td>
+          </tr> 
+          <tr>
+            <td>Percent SLA</td>
+            <td><div class="td65percent"><%= sprintf('%0.2f' '%%', @percent_sla.to_f*100) %></div></td>
+            <td><span class="metric_description">The percentage of all 5 minute samples that meet the SLA criterion.</span></td>
+          </tr> 
+          <tr>
+            <td>Within SLA Streaks</td> 
+            <td><div class="td65percent"><%= @streak_count %></div></td>
+            <td><span class="metric_description">Streaks that fall within the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.</span></td>
+          </tr> 
+          <tr>
+            <td>Fail SLA Streaks</td>
+            <td><div class="td65percent"><%= @fails_count %></div></td>
+            <td><span class="metric_description">Streaks failing to meet the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.</span></td>
+          </tr> 
+        </table>
       </span>
     </div>
   </main>
