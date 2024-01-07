@@ -2,7 +2,7 @@
 
 require 'date'
 
-SLA_VALUE=268 # Mbits/s
+SLA_VALUE=258 # Mbits/s
 
 log_file_path = '~/data/log/speedtest/speedtest.simple.log'
 
@@ -35,8 +35,8 @@ entries.each do |entry|
     #date = date_match[1].gsub('/', '')
     time = date_match[2].gsub(':', '')
     download = download_match[1].to_f
-    downloadh = download_match[1].to_f >= 268 ? download_match[1].to_f : 0.to_f
-    downloadl = download_match[1].to_f < 268 ? download_match[1].to_f : 0.to_f
+    downloadh = download_match[1].to_f >= 258 ? download_match[1].to_f : 0.to_f
+    downloadl = download_match[1].to_f < 258 ? download_match[1].to_f : 0.to_f
     upload = upload_match[1].to_f
 
     # Store in arrays
