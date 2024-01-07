@@ -5,6 +5,7 @@ require 'chartkick'
 
 set :bind, '0.0.0.0'
 set :port, 4567
+set :public_folder, __dir__ + '/public'
 
 
 get '/' do
@@ -14,14 +15,7 @@ get '/' do
 end
 
 def stddev(ary)
-  #ary = [1, 2, 3, 4, 5, 6, 7, 8]
-puts "ARY"
-puts ary[1].class
-puts "ARY"
-ary.map! { |elt| elt.to_f }
-puts "ARY"
-puts ary[1].class
-puts "ARY"
+  ary.map! { |elt| elt.to_f } # String can't be coerced into Float .. so map all vals to float in place
   
   # why am i using Arra#sum ? .. OK ..
   # Using the #sum method from Array is many, many times faster than using the alternative, inject.
@@ -155,8 +149,8 @@ __END__
         var uploadValue = data.getValue(i, 2);
       
         // Set colors based on the condition for DOWNLOAD and UPLOAD
-        var downloadColor = downloadValue > 268 ? '#00FF00' : '#FF0000';  // Adjusted this line
-        var uploadColor = uploadValue > 268 ? '#FF0000' : '#FF0000';
+        var downloadColor = downloadValue > 258 ? '#00FF00' : '#FF0000';  // Adjusted this line
+        var uploadColor = uploadValue > 258 ? '#FF0000' : '#FF0000';
       
         // Set the color for the data points
         data.setRowProperty(i, 'style', 'point { stroke-color: ' + downloadColor + '; fill-color: ' + downloadColor + '; }');
@@ -184,7 +178,7 @@ __END__
     {
       color:blue;
     }
-    .td65percent {
+    .td80percent {
       max-width: 300px; // Desired max width
       width: max-content;
     }
@@ -197,11 +191,17 @@ __END__
     }
     
     footer {
-      height: 4rem;
+      height: -10rem;
       position: fixed;
       bottom: 0;
       margin-left: 10px;
       margin-right: 10px;
+      margin-top: 10px;
+      text-align: right;
+      display: block;
+    }
+    .right_text {
+      text-align: right;
     }
     .description {
       margin-top: 50px;
@@ -222,6 +222,7 @@ __END__
       border-collapse: collapse;
     }
     th {
+      word-wrap:break-word;
       border: 1px solid black;
       border-collapse: collapse;
       background-color: lightgrey;
@@ -230,6 +231,13 @@ __END__
       background-color: #f2f2f2;
       border: 1px solid black;
       border-collapse: collapse;
+    }
+    .desc_width {
+      max-width: 150px; 
+      word-wrap: break-word;
+    }
+    .width_500px {
+      width: 500px;
     }
   </style>
 </head>
@@ -242,7 +250,7 @@ __END__
         This chart shows Speedtest results of samples taken every 5 minute. The Y-axis or height of the point indicates the value for Mbits/s at the time the sample was measured.
       </span>
         <ul id="chart_div_description_span_ul">
-          <li>DOWNLOADLOW is in <span class="red">RED</span>. Any sample that has a value which is less than the published SLA (268 Mbits/s) is part of this series.</li>
+          <li>DOWNLOADLOW is in <span class="red">RED</span>. Any sample that has a value which is less than the published SLA (258 Mbits/s) is part of this series.</li>
           <li>DOWNLOADHI is in <span class="green">GREEN</span>. Any sample that has a value which equals or exceeds the published SLA is part of this series.</li>
           <li>UPLOAD is in <span class="blue">BLUE</span>.</li>
         </ul>
@@ -253,65 +261,78 @@ __END__
           <tr>
             <th>Metric</th>
             <th>Value</th>
-            <th>Description</th>
+            <th class="width_500px">Description</th>
+            <th class="width_500px">Information</th>
           </tr> 
   
           <tr>
             <td>Sample Span</td>
-            <td class="td65percent"><%= @sample_span_dhms %></div></td>
+            <td class="td80percent"><%= @sample_span_dhms %></div></td>
             <td><span class="metric_description">The span of time covered by these metrics.</span></td>
+            <td rowspan="9"><div class="td80percent"><img width="500" height="300" src="img/virgin_media_service_summary.png"></img></div></td>
           </tr> 
           <tr>
             <td>Total point count</td>
-            <td class="td65percent"><%= @total_point_count %></div></td>
+            <td class="td80percent"><%= @total_point_count %></div></td>
             <td><span class="metric_description">The total count of the 5 minute samples present in the metric calculations.</span></td>
+            <td></td>
           </tr> 
           <tr>
             <td>Below SLA count</td>
-            <td><div class="td65percent"><%= @download_lo_count %></div></td>
-            <td><span class="metric_description">The count of 5 minute samples that fall below the published SLA value of 268 Mbits/s</span></td>
+            <td><div class="td80percent"><%= @download_lo_count %></div></td>
+            <td><span class="metric_description">The count of 5 minute samples that fall below the published SLA value of 258 Mbits/s</span></td>
+            <td></td>
           </tr> 
           <tr>
             <td>Above SLA count</td>
-            <td></span><div class="td65percent"><%= @download_hi_count %></div></td>
-            <td><span class="metric_description">The count of 5 minute samples that fall within the published 268 Mbit/s SLA.</span></td>
+            <td></span><div class="td80percent"><%= @download_hi_count %></div></td>
+            <td><span class="metric_description">The count of 5 minute samples that fall within the published 258 Mbit/s SLA.</span></td>
+            <td></td>
           </tr> 
           <tr>
             <td>Standard Deviationve SLA count</td>
-            <td></span><div class="td65percent"><%= @standard_deviation %></div></td>
+            <td></span><div class="td80percent"><%= @standard_deviation %></div></td>
             <td><span class="metric_description">The Standard Deviation of the whole set of Download times</span></td>
+            <td></td>
           </tr> 
           <tr>
             <td>Percent Within SLA</td>
-            <td><div class="td65percent"><%= sprintf('%0.2f' '%%', @percent_sla.to_f*100) %></div></td>
-            <td><span class="metric_description">The percentage of all 5 minute samples that meet the SLA criterion (268 Mbits/s Download).</span></td>
+            <td><div class="td80percent"><%= sprintf('%0.2f' '%%', @percent_sla.to_f*100) %></div></td>
+            <td><span class="metric_description">The percentage of all 5 minute samples that meet the SLA criterion (258 Mbits/s Download).</span></td>
+            <td></td>
           </tr> 
           <tr>
             <td>Percent Failing to meet SLA</td>
-            <td><div class="td65percent"><%= sprintf('%0.2f' '%%', @percent_fail.to_f*100) %></div></td>
+            <td><div class="td80percent"><%= sprintf('%0.2f' '%%', @percent_fail.to_f*100) %></div></td>
             <td><span class="metric_description">The percentage of all 5 minute samples that fail meet the SLA criterion.</span></td>
+            <td></td>
           </tr> 
           <tr>
             <td>Within SLA Streaks</td> 
-            <td><div class="td65percent"><%= @streak_count %></div></td>
-            <td><span class="metric_description">Streaks that fall within the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.</span></td>
+            <td><div class="td80percent"><%= @streak_count %></div></td>
+            <td>
+              <span class="metric_description">
+                Streaks that fall within the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. 
+                This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.
+            </span></td>
+            <td></td>
           </tr> 
           <tr>
             <td>Fail SLA Streaks</td>
-            <td><div class="td65percent"><%= @fails_count %></div></td>
-            <td><span class="metric_description">Streaks failing to meet the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.</span></td>
-          </tr> 
-          <tr>
-            <td>Virgin Media Service Summary</td>
-            <td><div class="td65percent"><img src="virging_media_service_summary.png"></img>></div></td>
-            <td><span class="metric_description">Virgin Media's summary of services including "Guaranteed Minimum" speeds.</span></td>
+            <td><div class="td80percent"><%= @fails_count %></div></td>
+            <td>
+              <span class="metric_description">
+                Streaks failing to meet the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. 
+                This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.
+              </span></td>
+            <td></td>
           </tr> 
         </table>
       </span>
     </div>
   </main>
-  <footer>
-  <div>
+  <footer style="text-align: right;">
+  <div class="right_text">
     Copyleft <a href="mailto:morgan@morganism.dev">morganism</a>. All rights reversed. <a target="_blank" href="https://git.morganism.dev/osx-utils/tree/master/speedtest/rare_medium/visualise/">GitHub source</a>
   </div>
   </footer>
