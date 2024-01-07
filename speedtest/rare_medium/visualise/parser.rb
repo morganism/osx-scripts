@@ -61,5 +61,5 @@ puts "DATETIME,DOWNLOADLOW,DOWNLOADHI,UPLOAD,SLA"
 count = datetimes.size
 for i in 0..count do
   line = "#{datetimes[i]},#{downloadls[i]},#{downloadhs[i]},#{uploads[i]},#{SLA_VALUE}"
-  puts line unless line.eql? ',,,'
+  puts line unless line.start_with? ','
 end
