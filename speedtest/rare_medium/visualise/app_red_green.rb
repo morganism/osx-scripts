@@ -13,6 +13,29 @@ get '/' do
   erb :chart
 end
 
+def stddev(ary)
+  #ary = [1, 2, 3, 4, 5, 6, 7, 8]
+puts "ARY"
+puts ary[1].class
+puts "ARY"
+ary.map! { |elt| elt.to_f }
+puts "ARY"
+puts ary[1].class
+puts "ARY"
+  
+  # why am i using Arra#sum ? .. OK ..
+  # Using the #sum method from Array is many, many times faster than using the alternative, inject.
+  # The #sum method was only added to Array in Ruby 2.4, which is why you might see alternative implementations in other places on the Internet.
+
+  ary_size = ary.size
+  ary_sum = ary.sum(0.0)
+  mean = ary_sum / ary_size
+  sum = ary.sum(0.0) { |element| (element - mean) ** 2 }
+  variance = sum / (ary.size - 1)
+  standard_deviation = Math.sqrt(variance)
+
+end
+
 def readCSV
   @data = CSV.read(File.expand_path('~/data/log/speedtest/speedtest.csv'), headers: true)
 end
@@ -22,12 +45,15 @@ def aggregate_stats
   @download_lo_count = 0
   @download_hi_count = 0
 
+  @download_values = []
   strks = []
 
   @data.each do |row|
     datetime = row['DATETIME']
     download_lo = row['DOWNLOADLOW']
     download_hi = row['DOWNLOADHI']
+    @download_values << download_lo unless download_lo.to_i == 0
+    @download_values << download_hi unless download_hi.to_i == 0
     upload = row['UPLOAD']
     sla_value = row['SLA']
 
@@ -45,6 +71,7 @@ def aggregate_stats
     @total_point_count += 1
   end
   @percent_sla = @download_hi_count.to_f / @total_point_count.to_f
+  @percent_fail = @download_lo_count.to_f / @total_point_count.to_f
   
   strks_string = strks.join('')
   fails_string = strks_string
@@ -77,7 +104,7 @@ def aggregate_stats
   dd, hh = hh.divmod(24)
   @sample_span_dhms = "%d days, %d hours, %d minutes and %d seconds" % [dd, hh, mm, ss]
  
-  
+  @standard_deviation = stddev(@download_values) 
 end
 
 
@@ -250,9 +277,19 @@ __END__
             <td><span class="metric_description">The count of 5 minute samples that fall within the published 268 Mbit/s SLA.</span></td>
           </tr> 
           <tr>
-            <td>Percent SLA</td>
+            <td>Standard Deviationve SLA count</td>
+            <td></span><div class="td65percent"><%= @standard_deviation %></div></td>
+            <td><span class="metric_description">The Standard Deviation of the whole set of Download times</span></td>
+          </tr> 
+          <tr>
+            <td>Percent Within SLA</td>
             <td><div class="td65percent"><%= sprintf('%0.2f' '%%', @percent_sla.to_f*100) %></div></td>
-            <td><span class="metric_description">The percentage of all 5 minute samples that meet the SLA criterion.</span></td>
+            <td><span class="metric_description">The percentage of all 5 minute samples that meet the SLA criterion (268 Mbits/s Download).</span></td>
+          </tr> 
+          <tr>
+            <td>Percent Failing to meet SLA</td>
+            <td><div class="td65percent"><%= sprintf('%0.2f' '%%', @percent_fail.to_f*100) %></div></td>
+            <td><span class="metric_description">The percentage of all 5 minute samples that fail meet the SLA criterion.</span></td>
           </tr> 
           <tr>
             <td>Within SLA Streaks</td> 
@@ -264,13 +301,18 @@ __END__
             <td><div class="td65percent"><%= @fails_count %></div></td>
             <td><span class="metric_description">Streaks failing to meet the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.</span></td>
           </tr> 
+          <tr>
+            <td>Virgin Media Service Summary</td>
+            <td><div class="td65percent"><img src="virging_media_service_summary.png"></img>></div></td>
+            <td><span class="metric_description">Virgin Media's summary of services including "Guaranteed Minimum" speeds.</span></td>
+          </tr> 
         </table>
       </span>
     </div>
   </main>
   <footer>
   <div>
-    Copyleft. All rights reversed. <a target="_blank" href="https://git.morganism.dev/osx-utils/tree/master/speedtest/rare_medium/visualise/">GitHub source</a>
+    Copyleft <a href="mailto:morgan@morganism.dev">morganism</a>. All rights reversed. <a target="_blank" href="https://git.morganism.dev/osx-utils/tree/master/speedtest/rare_medium/visualise/">GitHub source</a>
   </div>
   </footer>
 </body>
