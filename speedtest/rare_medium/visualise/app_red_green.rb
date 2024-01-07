@@ -76,17 +76,23 @@ def aggregate_stats
   @streak_count = {}
   @fails_count = {}
   @strks_ary.each do |elt|
-    if (elt.length > 2) # a streak is more than 2 in a row
+    if (elt.length > 3) # a streak is more than 3 in a row
       key = "#{elt.length * 5}m"
       @streak_count[key] = (@streak_count[key].nil?) ? 1 : @streak_count[key] + 1
     end
   end
   @fails_ary.each do |elt|
-    if (elt.length > 2) # a streak is more than 2 in a row
+    if (elt.length > 3) # a streak is more than 3 in a row
       key = "#{elt.length * 5}m"
       @fails_count[key] = (@fails_count[key].nil?) ? 1 : @fails_count[key] + 1
     end
   end
+  streak_count_values_sum = @streak_count.values.sum
+  fails_count_values_sum = @fails_count.values.sum
+  streaks_total_count = streak_count_values_sum + fails_count_values_sum
+
+  @streak_count_sla_percent  = streak_count_values_sum.to_f / streaks_total_count
+  @streak_count_fail_percent = fails_count_values_sum.to_f / streaks_total_count
   
   # let's use some beautiful ruby sugar to calculate days, hours, minutes of given duration in sconds
   # @total_point_count * 5 will give total_seconds
@@ -308,13 +314,25 @@ __END__
             <td></td>
           </tr> 
           <tr>
+            <td>Streak Percent within  SLA</td>
+            <td><div class="td80percent"><%= sprintf('%0.2f' '%%', @streak_count_sla_percent.to_f*100) %></div></td>
+            <td><span class="metric_description">The percentage of all 5 minute samples that fail meet the SLA criterion.</span></td>
+            <td></td>
+          </tr> 
+          <tr>
+            <td>Streak Percent Failing to meet SLA</td>
+            <td><div class="td80percent"><%= sprintf('%0.2f' '%%', @streak_count_fail_percent.to_f*100) %></div></td>
+            <td><span class="metric_description">The percentage of all 5 minute samples that fail meet the SLA criterion.</span></td>
+            <td></td>
+          </tr> 
+          <tr>
             <td>Within SLA Streaks</td> 
             <td><div class="td80percent"><%= @streak_count %></div></td>
             <td>
               <span class="metric_description">
-                Streaks that fall within the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. 
-                This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.
-            </span></td>
+                Streaks that fall within the SLA.
+              </span>
+            </td>
             <td></td>
           </tr> 
           <tr>
@@ -324,7 +342,8 @@ __END__
               <span class="metric_description">
                 Streaks failing to meet the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. 
                 This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.
-              </span></td>
+              </span>
+            </td>
             <td></td>
           </tr> 
         </table>
