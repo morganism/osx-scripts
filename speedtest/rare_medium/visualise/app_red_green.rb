@@ -41,6 +41,8 @@ def aggregate_stats
 
   @download_values = []
   strks = []
+  @normal_availability_speed_sla = 0
+  @normal_availability_speed_fail = 0
 
   @data.each do |row|
     datetime = row['DATETIME']
@@ -48,6 +50,13 @@ def aggregate_stats
     download_hi = row['DOWNLOADHI']
     @download_values << download_lo unless download_lo.to_i == 0
     @download_values << download_hi unless download_hi.to_i == 0
+
+    if (download_hi.to_i >= 505) 
+      @normal_availability_speed_sla += 1 
+    else 
+      @normal_availability_speed_fail += 1
+    end
+   
     upload = row['UPLOAD']
     sla_value = row['SLA']
 
@@ -76,13 +85,13 @@ def aggregate_stats
   @streak_count = {}
   @fails_count = {}
   @strks_ary.each do |elt|
-    if (elt.length > 3) # a streak is more than 3 in a row
+    if (elt.length >= 4) # a streak is more than 4 in a row
       key = "#{elt.length * 5}m"
       @streak_count[key] = (@streak_count[key].nil?) ? 1 : @streak_count[key] + 1
     end
   end
   @fails_ary.each do |elt|
-    if (elt.length > 3) # a streak is more than 3 in a row
+    if (elt.length >= 4) # a streak is more than 4 in a row
       key = "#{elt.length * 5}m"
       @fails_count[key] = (@fails_count[key].nil?) ? 1 : @fails_count[key] + 1
     end
@@ -172,6 +181,32 @@ __END__
   </script>
 
   <style>
+  /* Tooltip container */
+  .tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+  }
+  
+  /* Tooltip text */
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+   
+    /* Position the tooltip text - see examples below! */
+    position: absolute;
+    z-index: 1;
+  }
+  
+  /* Show the tooltip text when you mouse over the tooltip container */
+  .tooltip:hover .tooltiptext {
+    visibility: visible;
+  }
     .red
     {
       color:red;
@@ -195,7 +230,9 @@ __END__
     main {
       min-height: calc(100vh - 4rem);
     }
-    
+    .bottom_div_height {
+      height: 10rem; 
+    }
     footer {
       height: -10rem;
       position: fixed;
@@ -284,6 +321,18 @@ __END__
             <td></td>
           </tr> 
           <tr>
+            <td>Within Normal Avaiability count</td>
+            <td class="td80percent"><%= @normal_availability_speed_sla %></div></td>
+            <td><span class="metric_description">Sppeds in the normal zone</span></td>
+            <td></td>
+          </tr> 
+          <tr>
+            <td>Fail Normal Available Speed</td>
+            <td class="td80percent"><%= @normal_availability_speed_fail %></div></td>
+            <td><span class="metric_description">Sppeds below the normal zone</span></td>
+            <td></td>
+          </tr> 
+          <tr>
             <td>Below SLA count</td>
             <td><div class="td80percent"><%= @download_lo_count %></div></td>
             <td><span class="metric_description">The count of 5 minute samples that fall below the published SLA value of 258 Mbits/s</span></td>
@@ -314,15 +363,16 @@ __END__
             <td></td>
           </tr> 
           <tr>
-            <td>Streak Percent within  SLA</td>
+            <td>Streak Percent within SLA</td>
             <td><div class="td80percent"><%= sprintf('%0.2f' '%%', @streak_count_sla_percent.to_f*100) %></div></td>
-            <td><span class="metric_description">The percentage of all 5 minute samples that fail meet the SLA criterion.</span></td>
+            <td><span class="metric_description">The percentage of all Streaks (4 or more 5 minute samples in a row)  that meet the SLA criterion.</span></td>
             <td></td>
           </tr> 
           <tr>
             <td>Streak Percent Failing to meet SLA</td>
             <td><div class="td80percent"><%= sprintf('%0.2f' '%%', @streak_count_fail_percent.to_f*100) %></div></td>
-            <td><span class="metric_description">The percentage of all 5 minute samples that fail meet the SLA criterion.</span></td>
+            <td><span class="metric_description">The percentage of all Streaks (I'm being generous with a 20 minute Streak rather than an hour, which is the standard bookable amount of time,
+                but then Virgin would not even have single Streak) that fail meet the SLA criterion.</span></td>
             <td></td>
           </tr> 
           <tr>
@@ -337,18 +387,17 @@ __END__
           </tr> 
           <tr>
             <td>Fail SLA Streaks</td>
-            <td><div class="td80percent"><%= @fails_count %></div></td>
+            <td><div class="tooltip"><span class="tooltiptext"><%= @fails_count %></span></div></td>
             <td>
-              <span class="metric_description">
-                Streaks failing to meet the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. 
-                This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.
-              </span>
+							Streaks failing to meet the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. 
+							This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.
             </td>
             <td></td>
           </tr> 
         </table>
       </span>
     </div>
+    <div class="bottom_div_height"> </div>
   </main>
   <footer style="text-align: right;">
   <div class="right_text">

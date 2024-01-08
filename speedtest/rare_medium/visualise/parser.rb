@@ -32,7 +32,6 @@ entries.each do |entry|
   if date_match && download_match && upload_match
     # Extracted data
     date = Date.strptime(date_match[1], '%m/%d/%y').strftime('%d%m%Y')
-    #date = date_match[1].gsub('/', '')
     time = date_match[2].gsub(':', '')
     download = download_match[1].to_f
     downloadh = download_match[1].to_f >= 258 ? download_match[1].to_f : 0.to_f
@@ -43,6 +42,7 @@ entries.each do |entry|
     dates << date
     times << time
     datetimes << "#{date}#{time}" 
+STDERR.puts datetimes
     downloads << download
     downloadls << downloadl
     downloadhs << downloadh
