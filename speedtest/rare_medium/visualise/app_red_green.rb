@@ -146,9 +146,11 @@ __END__
         curveType: 'none',
         legend: { position: 'bottom' },
         pointSize: 1,
+        hAxis: {title: 'Datetime 5m buckets'},
+        vAxis: {title: 'MBps'},
         series: {
                   0: { color: '#ff0000',
-                       lineWidth: 2,
+                       lineWidth: 1,
                        pointSize: 2 },
                   1: { color: '#0fff0f',
                        lineWidth: 1,
@@ -323,13 +325,13 @@ __END__
           <tr>
             <td>Within Normal Avaiability count</td>
             <td class="td80percent"><%= @normal_availability_speed_sla %></div></td>
-            <td><span class="metric_description">Sppeds in the normal zone</span></td>
+            <td><span class="metric_description">Speeds in the normal zone</span></td>
             <td></td>
           </tr> 
           <tr>
             <td>Fail Normal Available Speed</td>
             <td class="td80percent"><%= @normal_availability_speed_fail %></div></td>
-            <td><span class="metric_description">Sppeds below the normal zone</span></td>
+            <td><span class="metric_description">Speeds below the normal zone</span></td>
             <td></td>
           </tr> 
           <tr>
@@ -389,8 +391,8 @@ __END__
             <td>Fail SLA Streaks</td>
             <td><div class="tooltip"><span class="tooltiptext"><%= @fails_count %></span></div></td>
             <td>
-							Streaks failing to meet the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. 
-							This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.
+              Streaks failing to meet the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. 
+              This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.
             </td>
             <td></td>
           </tr> 
