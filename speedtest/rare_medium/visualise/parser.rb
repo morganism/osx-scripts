@@ -42,7 +42,7 @@ entries.each do |entry|
     dates << date
     times << time
     datetimes << "#{date}#{time}" 
-STDERR.puts datetimes
+#STDERR.puts datetimes
     downloads << download
     downloadls << downloadl
     downloadhs << downloadh

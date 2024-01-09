@@ -389,7 +389,8 @@ __END__
           </tr> 
           <tr>
             <td>Fail SLA Streaks</td>
-            <td><div class="tooltip"><span class="tooltiptext"><%= @fails_count %></span></div></td>
+            <!--<td><div class="tooltip"><span class="tooltiptext"><%= @fails_count %></span></div></td>-->
+            <td><div class="td80percent"><%= @fails_count %></div></td>
             <td>
               Streaks failing to meet the SLA. A 'Streak' is defined herein as 3 or more contiguous 5 minute samples. 
               This value is a hash of Streak Length in minutes :: Count of the number of streaks of that duration.
